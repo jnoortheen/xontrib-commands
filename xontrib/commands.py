@@ -5,16 +5,25 @@ import sys
 import typing as tp
 from collections import defaultdict
 
+import functools
+
 
 class Command:
-    def __init__(self, func: tp.Callable):
+    def __init__(self, func: tp.Callable, **kwargs):
         """Convert the given function to alias and also create a argparser for its parameters"""
-        import arger
-        import argparse
         dashed_name = func.__name__.replace('_', '-')
-        self.parser = arger.Arger(func=func, formatter_class=argparse.RawTextHelpFormatter)
+        kwargs["func"] = func
+        self.kwargs = kwargs
         # convert to
         builtins.aliases[dashed_name] = self.handle_cmd
+
+    @property
+    @functools.lru_cache()
+    def parser(self):
+        import arger
+        import argparse
+
+        return arger.Arger(**self.kwargs, formatter_class=argparse.RawTextHelpFormatter)
 
     def handle_cmd(self, args):
         self.parser.run(*args)

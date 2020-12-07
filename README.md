@@ -22,6 +22,20 @@ xontrib load commands
 
 ```
 
+## building alias
+
+Use [`xontrib.commands.Command`](https://github.com/jnoortheen/xontrib-commands/blob/main/xontrib/commands.py#L9) 
+to build [arger](https://github.com/jnoortheen/arger) dispatcher
+for your functions.
+
+```py
+from xontrib.commands import Command
+@Command
+def record_stats(pkg_name=".", path=".local/stats.txt"):
+    stat = $(scc @(pkg_name))
+    echo @($(date) + stat) | tee -a @(path)
+```
+
 ## Commands
 
 ### 1. reload-mods
