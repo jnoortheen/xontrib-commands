@@ -2,10 +2,6 @@
 Useful xonsh-shell commands/alias functions
 </p>
 
-<p align="center">
-If you like the idea click ⭐ on the repo and stay tuned.
-</p>
-
 ## Installation
 
 To install use pip:
@@ -34,6 +30,17 @@ from xontrib.commands import Command
 def record_stats(pkg_name=".", path=".local/stats.txt"):
     stat = $(scc @(pkg_name))
     echo @($(date) + stat) | tee -a @(path)
+```
+
+Now a full CLI is ready
+```sh
+$ record-stats --help                                                                        
+usage: xonsh [-h] [-p PKG_NAME] [-a PATH]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p PKG_NAME, --pkg-name PKG_NAME
+  -a PATH, --path PATH
 ```
 
 ## Commands
