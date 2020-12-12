@@ -51,6 +51,10 @@ optional arguments:
 ### 2. report-key-bindggs
 ![](./docs/2020-12-02-14-30-17.png)
 
+### 3. dev
+- command to cd around fast. 
+- much like https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/pj
+
 ## Credits
 
 This package was created with [xontrib cookiecutter template](https://github.com/jnoortheen/xontrib-cookiecutter).
