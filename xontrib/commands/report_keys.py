@@ -1,7 +1,5 @@
 import builtins
 import inspect
-import io
-import pydoc
 import typing as tp
 from collections import defaultdict
 
@@ -58,6 +56,7 @@ def _grouped_by_modules():
 @Command
 def report_key_bindings(_stdout):
     """Show current Prompt-toolkit bindings in a nice table format"""
+
     from rich.console import Console
     from rich.table import Table
 
@@ -76,15 +75,18 @@ def report_key_bindings(_stdout):
         for handle, keys in handles:
             module = f"{handle.__module__ if mod == '...' else ''}.{handle.__name__}"
             docstr = inspect.getdoc(handle) or ""
-            mod_table.add_row("\n".join(keys), ". ".join([docstr, f"fn: {module}"]))
+            mod_table.add_row(
+                "\n".join(keys), ". ".join([docstr, f"[blue]fn: {module}[/blue]"])
+            )
         tables.append(mod_table)
 
-    console = Console(file=io.StringIO(), force_terminal=True)
-    console.print(*tables)
-    text = console.file.getvalue()
+    console = Console()
     # https://bugs.python.org/issue37871
-    pydoc.pager(text)
     # with console.pager():
-    #     for line in text.splitlines():
-    #         print(line)
-    # c.print(*tables)
+    console.print(*tables)
+
+
+def term_test(c):
+    from rich import inspect
+
+    inspect(c)

@@ -101,7 +101,6 @@ def _dev(_arger_, _namespace_, name: str):
         > $PROJECT_PATHS = ["~/src/"]
         > dev proj-name # --> will cd into ~/src/proj-name
     """
-    raise Exception
     added_paths = get_added_paths()
     if name in ENVS:
         ENVS[name]()
