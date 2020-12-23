@@ -35,7 +35,7 @@ Code = "https://github.com/jnoortheen/xontrib-commands"
 
 [tool.poetry.dependencies]
 python = ">=3.6"
-arger = {version="1.*", python =">=3.6, <4.0"}
+arger = {version="^1.2.7", python =">=3.6, <4.0"}
 rich = {version="*", python =">=3.6, <4.0"}
 
 [tool.poetry.dev-dependencies]

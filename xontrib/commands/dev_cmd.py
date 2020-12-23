@@ -2,6 +2,8 @@ import operator
 import os
 import typing as tp
 
+from arger import Argument
+
 from .utils import Command, xsh
 import xonsh.tools as xt
 from pathlib import Path
@@ -78,8 +80,31 @@ def find_proj_path(name):
             return path
 
 
+def _list_cmds():
+    from rich.console import Console
+
+    c = Console()
+    paths = get_added_paths()
+    c.print("Paths", paths)
+
+
+def _add_current_path():
+    from rich.console import Console
+
+    c = Console()
+    path = Path.cwd().resolve()
+    c.log("Adding cwd to project-paths", {path.name: path})
+    get_added_paths(str(path))
+
+
 @Command
-def _dev(_arger_, _namespace_, name: str):
+def _dev(
+    _arger_,
+    _namespace_,
+    name: tp.cast(str, Argument(nargs="?")),
+    add=False,
+    ls=False,
+):
     """A command to cd into a directory
 
     Inspired from my own workflow and these commands
@@ -89,9 +114,16 @@ def _dev(_arger_, _namespace_, name: str):
     Parameters
     ----------
     name
-        - name of the folder to cd into.
-            This searches for names under $PROJECT_PATHS
-            or the ones registered with `dev --add`
+        name of the folder to cd into.
+        This searches for names under $PROJECT_PATHS
+        or the ones registered with `dev --add`
+    add
+        register the current folder to dev command.
+        When using this, it will get saved in a file,
+        also that is used during completions.
+    ls
+        show currently registered paths
+
     Notes
     -----
         One can use `register_project` function to regiter custom_callbacks to run on cd to project path
@@ -100,35 +132,18 @@ def _dev(_arger_, _namespace_, name: str):
     -------
         > $PROJECT_PATHS = ["~/src/"]
         > dev proj-name # --> will cd into ~/src/proj-name
+        > dev --add
     """
-    added_paths = get_added_paths()
-    if name in ENVS:
-        ENVS[name]()
-    elif name in added_paths:
-        return _start_proj_shell(Path(added_paths[name]))
-    else:
-        return _start_proj_shell(name)
-
-
-@Command
-def _dev_add(ls=False):
-    """register the current folder to dev command.
-    When using this, it will get saved a file,
-    also that is used during completions, and fuzzy search on them will work.
-
-    Parameters
-    ----------
-    ls
-        show currently registered paths
-    """
-    from rich.console import Console
-
-    c = Console()
 
     if ls:
-        paths = get_added_paths()
-        c.print("Paths", paths)
+        _list_cmds()
+    elif add:
+        _add_current_path()
     else:
-        path = Path.cwd().resolve()
-        c.log("Adding cwd to project-paths", {path.name: path})
-        get_added_paths(str(path))
+        added_paths = get_added_paths()
+        if name in ENVS:
+            ENVS[name]()
+        elif name in added_paths:
+            return _start_proj_shell(Path(added_paths[name]))
+        else:
+            return _start_proj_shell(name)

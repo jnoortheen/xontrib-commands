@@ -45,6 +45,8 @@ optional arguments:
 
 ## Commands
 
+- each of the commands use argparser. Please use `cmd --help` to get more info and usage examples.
+
 ### 1. reload-mods
 ![](./docs/2020-12-02-14-30-47.png)
 
