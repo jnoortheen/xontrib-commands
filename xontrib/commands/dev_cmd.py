@@ -19,6 +19,15 @@ def added_file_path() -> Path:
     )
 
 
+def update_saved_paths(paths=()):
+    import json
+
+    file = tp.cast(Path, added_file_path)
+    if paths:
+        content = json.dumps(list(set(paths)))
+        file.write_text(content)
+
+
 def get_added_paths(add_path: str = None) -> tp.Dict[str, str]:
     import json
 
@@ -30,8 +39,8 @@ def get_added_paths(add_path: str = None) -> tp.Dict[str, str]:
         paths = []
     if add_path:
         paths.append(add_path)
-        content = json.dumps(list(set(paths)))
-        file.write_text(content)
+        update_saved_paths(paths)
+
     return {os.path.split(p)[-1]: p for p in paths}
 
 
@@ -144,6 +153,13 @@ def _dev(
         if name in ENVS:
             ENVS[name]()
         elif name in added_paths:
-            return _start_proj_shell(Path(added_paths[name]))
-        else:
-            return _start_proj_shell(name)
+
+            path = added_paths[name]
+            if os.path.exists(path):
+                return _start_proj_shell(Path())
+            else:
+                # old/expired link
+                added_paths.pop(name)
+                update_saved_paths(tuple(added_paths.values()))
+
+        return _start_proj_shell(name)
