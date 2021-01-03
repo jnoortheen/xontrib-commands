@@ -1,12 +1,12 @@
 import operator
 import os
 import typing as tp
+from pathlib import Path
 
+import xonsh.tools as xt
 from arger import Argument
 
 from .utils import Command, xsh
-import xonsh.tools as xt
-from pathlib import Path
 
 ENVS = {}
 
