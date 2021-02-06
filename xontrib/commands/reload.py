@@ -3,7 +3,7 @@ import sys
 from .utils import Command
 
 
-@Command
+@Command.reg
 def reload_mods(name: str):
     """Reload any python module in the current xonsh session.
     Helpful during development.

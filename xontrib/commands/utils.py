@@ -17,6 +17,12 @@ class Command:
         # convert to
         builtins.aliases[dashed_name] = self.handle_cmd
 
+    @classmethod
+    def reg(cls, func, **kwargs):
+        """pickle safe way to register alias function"""
+        cls(func, **kwargs)
+        return func
+
     @property
     @functools.lru_cache()
     def parser(self):

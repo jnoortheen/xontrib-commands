@@ -106,7 +106,7 @@ def _add_current_path():
     get_added_paths(str(path))
 
 
-@Command
+@Command.reg
 def _dev(
     _arger_,
     _namespace_,

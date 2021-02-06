@@ -1,5 +1,5 @@
 <p align="center">
-Useful xonsh-shell commands/alias functions
+Useful xonsh-shell commands/alias/completer functions
 </p>
 
 ## Installation
@@ -15,7 +15,6 @@ xpip install xontrib-commands
 
 ``` bash
 xontrib load commands
-
 ```
 
 ## building alias
@@ -26,7 +25,7 @@ for your functions.
 
 ```py
 from xontrib.commands import Command
-@Command
+@Command.reg
 def record_stats(pkg_name=".", path=".local/stats.txt"):
     stat = $(scc @(pkg_name))
     echo @($(date) + stat) | tee -a @(path)

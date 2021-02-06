@@ -53,7 +53,7 @@ def _grouped_by_modules():
     return final_cont
 
 
-@Command
+@Command.reg
 def report_key_bindings(_stdout):
     """Show current Prompt-toolkit bindings in a nice table format"""
 
