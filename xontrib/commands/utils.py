@@ -45,7 +45,7 @@ class Command:
         return self
 
 
-def run(*args):
+def run(*args) -> str:
     """helper function to run shell commands inside xonsh session"""
     import shlex
 

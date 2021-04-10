@@ -76,7 +76,7 @@ def _start_proj_shell(env: tp.Union[str, Path]):
 
 
 def _find_proj_path(name, op):
-    for direc in xsh.env.get("PROJECT_PATH", []):
+    for direc in xsh.env.get("PROJECT_PATHS", []):
         for path in Path(direc).glob("*"):
             if op(path.name, name):
                 return path

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xontrib-commands"
-version = "0.2.5"
+version = "0.2.6"
 description = "Useful xonsh-shell commands/alias functions"
 authors = ["Noortheen Raja NJ <jnoortheen@gmail.com>"]
 
