@@ -153,10 +153,9 @@ def _dev(
         if name in ENVS:
             ENVS[name]()
         elif name in added_paths:
-
             path = added_paths[name]
             if os.path.exists(path):
-                return _start_proj_shell(Path())
+                return _start_proj_shell(Path(path))
             else:
                 # old/expired link
                 added_paths.pop(name)
