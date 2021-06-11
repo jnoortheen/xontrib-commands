@@ -84,9 +84,3 @@ def report_key_bindings(_stdout):
     # https://bugs.python.org/issue37871
     # with console.pager():
     console.print(*tables)
-
-
-def term_test(c):
-    from rich import inspect
-
-    inspect(c)

@@ -5,6 +5,9 @@ from pathlib import Path
 
 import xonsh.tools as xt
 from arger import Argument
+from xonsh.cli_utils import ArgCompleter
+from xonsh.completers.tools import RichCompletion
+from xonsh.parsers.completion_context import CommandContext
 
 from .utils import Command, xsh
 
@@ -79,13 +82,12 @@ def _find_proj_path(name, op):
     for direc in xsh.env.get("PROJECT_PATHS", []):
         for path in Path(direc).glob("*"):
             if op(path.name, name):
-                return path
+                yield path
 
 
 def find_proj_path(name):
     for op in [operator.eq, str.startswith, operator.contains]:
-        path = _find_proj_path(name, op)
-        if path:
+        for path in _find_proj_path(name, op):
             return path
 
 
@@ -106,11 +108,19 @@ def _add_current_path():
     get_added_paths(str(path))
 
 
+class ProjNameCompleter(ArgCompleter):
+    def __call__(self, **kwargs):
+        command: CommandContext = kwargs.pop("command")
+        for name, path in get_added_paths().items():
+            yield RichCompletion(name, description=path)
+        yield from ENVS
+        for path in _find_proj_path(command.prefix, str.startswith):
+            yield RichCompletion(path.name, description=str(path))
+
+
 @Command.reg
 def _dev(
-    _arger_,
-    _namespace_,
-    name: tp.cast(str, Argument(nargs="?")),
+    name: tp.cast(str, Argument(nargs="?", completer=ProjNameCompleter())),
     add=False,
     ls=False,
 ):

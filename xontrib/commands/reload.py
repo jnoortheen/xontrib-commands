@@ -1,10 +1,17 @@
 import sys
 
+from arger import Argument
+from typing_extensions import Annotated
+
 from .utils import Command
 
 
+def module_name_completer(**_):
+    yield from sys.modules
+
+
 @Command.reg
-def reload_mods(name: str):
+def reload_mods(name: Annotated[str, Argument(completer=module_name_completer)]):
     """Reload any python module in the current xonsh session.
     Helpful during development.
 
@@ -29,7 +36,9 @@ def reload_mods(name: str):
     """
     # todo: implement a watcher mode
     import importlib
+    from rich.console import Console
 
+    console = Console()
     modules = list(
         sys.modules
     )  # create a copy of names. so that it will not raise warning
@@ -37,8 +46,8 @@ def reload_mods(name: str):
         mod = sys.modules[mod_name]
         if name and not mod_name.startswith(name):
             continue
-        print("reload ", mod_name)
+        console.print(f"reload [cyan] {mod_name}[/cyan]")
         try:
             importlib.reload(mod)
         except Exception as e:
-            print("failed to reload", mod_name, e)
+            console.print("[red]failed to reload [/red]", mod_name, e)
