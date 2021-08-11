@@ -47,9 +47,35 @@ class Command(ArgParserAlias):
         self.parser.run(*args)
 
 
-def run(*args) -> str:
+def _get_proc_func_():
+    import inspect, opcode
+
+    frame = inspect.currentframe()
+
+    try:
+        frame = frame.f_back
+        next_opcode = opcode.opname[ord(str(frame.f_code.co_code[frame.f_lasti + 3]))]
+        if next_opcode == "POP_TOP":
+            # or next_opcode == "RETURN_VALUE":
+            # include the above line in the if statement if you consider "return run()" to be assignment
+
+            # "I was not assigned"
+            return XSH.subproc_uncaptured
+    finally:
+        del frame
+    return XSH.subproc_captured_stdout
+
+
+def run(*args, capture: tp.Optional[bool] = None) -> str:
     """helper function to run shell commands inside xonsh session"""
     import shlex
+
+    if capture is None:
+        func = _get_proc_func_()
+    elif capture:
+        func = XSH.subproc_captured_stdout
+    else:
+        func = XSH.subproc_uncaptured
 
     cmd_args = list(args)
     if len(args) == 1 and isinstance(args[0], str) and " " in args[0]:
@@ -61,4 +87,4 @@ def run(*args) -> str:
             cmd_args = list(cmds)
         else:
             cmd_args = shlex.split(first_arg)
-    return XSH.subproc_captured_stdout(cmd_args)
+    return func(cmd_args)
