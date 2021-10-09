@@ -1,14 +1,22 @@
-import typing as tp
+import re
+from functools import cached_property
+from typing import Any, Callable, List, Optional
 
 import arger
 
 from xonsh.built_ins import XSH
 from xonsh.cli_utils import get_argparse_formatter_class, ArgParserAlias
+from xonsh.completers.tools import RichCompletion
+from xonsh.parsers.completion_context import CommandContext
 
 xsh = XSH
 
 
 class Arger(arger.Arger):
+    def __init__(self, **kwargs):
+        kwargs.setdefault("formatter_class", get_argparse_formatter_class())
+        super().__init__(**kwargs)
+
     def add_argument(self, *args, **kwargs):
         completer = kwargs.pop("completer", None)
         action = super().add_argument(*args, **kwargs)
@@ -18,14 +26,15 @@ class Arger(arger.Arger):
 
 
 class Command(ArgParserAlias):
-    def __init__(self, func: tp.Callable, **kwargs):
+    def __init__(self, func: Callable, **kwargs):
         """Convert the given function to alias and also create a argparser for its parameters"""
         super().__init__()
-        dashed_name = func.__name__.strip("_").replace("_", "-")
+        self.prog = func.__name__.strip("_").replace("_", "-")
         kwargs["func"] = func
+        kwargs["prog"] = self.prog
         self.kwargs = kwargs
         # convert to
-        xsh.aliases[dashed_name] = self
+        xsh.aliases[self.prog] = self
 
     @classmethod
     def reg(cls, func, **kwargs):
@@ -34,7 +43,7 @@ class Command(ArgParserAlias):
         return func
 
     def build(self) -> "Arger":
-        return Arger(**self.kwargs, formatter_class=get_argparse_formatter_class())
+        return Arger(**self.kwargs)
 
     def __call__(
         self, args, stdin=None, stdout=None, stderr=None, spec=None, stack=None
@@ -66,7 +75,7 @@ def _get_proc_func_():
     return XSH.subproc_captured_stdout
 
 
-def run(*args, capture: tp.Optional[bool] = None) -> str:
+def run(*args, capture: Optional[bool] = None) -> str:
     """helper function to run shell commands inside xonsh session"""
     import shlex
 
@@ -88,3 +97,110 @@ def run(*args, capture: tp.Optional[bool] = None) -> str:
         else:
             cmd_args = shlex.split(first_arg)
     return func(cmd_args)
+
+
+class NuclearCompleter:
+    builder: Any
+
+    @cached_property
+    def hyphen_param_matcher(self):
+        return re.compile(r"-(.+)=(.+)")
+
+    def generate_value_choices(self, rule, **kwargs):
+        if not rule.choices:
+            return
+
+        if callable(rule.choices):
+            yield from rule.choices(rule=rule, **kwargs)
+            return
+
+        # sequence
+        yield from rule.choices
+
+    def iter_completions(self, rule):
+        for kw in rule.keywords:
+            yield RichCompletion(kw, description=rule.help)
+
+    def _find_available_completions(self, rules, args, current_word, **extra):
+        """updated from nuclear"""
+        from nuclear.builder.rule import (
+            FlagRule,
+            ParameterRule,
+            PrimaryOptionRule,
+            PositionalArgumentRule,
+            ManyArgumentsRule,
+            SubcommandRule,
+            CliRule,
+        )
+        from nuclear.parser.transform import filter_rules
+        from nuclear.parser.parser import Parser
+        from nuclear.parser.context import RunContext
+
+        subcommands: List[SubcommandRule] = filter_rules(rules, SubcommandRule)
+        run_context: Optional[RunContext] = Parser(rules, dry=True).parse_args(args)
+        all_rules: List[CliRule] = run_context.active_rules
+        active_subcommands: List[SubcommandRule] = run_context.active_subcommands
+        if active_subcommands:
+            subcommands = filter_rules(active_subcommands[-1].subrules, SubcommandRule)
+
+            # current word is exactly the last command
+            if current_word in active_subcommands[-1].keywords:
+                yield current_word
+                return
+
+        flags = filter_rules(all_rules, FlagRule)
+        parameters = filter_rules(all_rules, ParameterRule)
+        primary_options = filter_rules(all_rules, PrimaryOptionRule)
+        pos_arguments = filter_rules(all_rules, PositionalArgumentRule)
+        many_args = filter_rules(all_rules, ManyArgumentsRule)
+
+        # "--param value" autocompletion
+        previous: Optional[str] = args[-2] if len(args) > 1 else None
+        if previous:
+            for rule in parameters:
+                for keyword in rule.keywords:
+                    if previous == keyword:
+                        yield from self.generate_value_choices(
+                            rule, current=current_word, **extra
+                        )
+                        return
+
+        # "--param=value" autocompletion
+        for rule in parameters:
+            for keyword in rule.keywords:
+                if current_word.startswith(keyword + "="):
+                    yield from map(
+                        lambda c: keyword + "=" + c,
+                        self.generate_value_choices(
+                            rule, current=current_word, **extra
+                        ),
+                    )
+                    return
+
+        for cont in [subcommands, flags, parameters, primary_options]:
+            for rule in cont:
+                yield from self.iter_completions(rule)
+        for cont in [pos_arguments, many_args]:
+            for rule in cont:
+                yield from self.generate_value_choices(
+                    rule, current=current_word, **extra
+                )
+
+    def xonsh_complete(self, command: CommandContext, **kwargs):
+        from nuclear.autocomplete.autocomplete import get_current_word
+
+        all_args = [a.raw_value for a in command.args]
+        args = all_args[1:]  # exclude first arg
+        current_word = get_current_word(args, command.arg_index)
+        comps = self._find_available_completions(
+            self.builder._CliBuilder__subrules,
+            args,
+            current_word,
+            command=command,
+            **kwargs
+        )
+        # yield from comps
+        for c in comps:
+            if c.startswith(current_word):
+                yield c
+                # yield escape_spaces(self.hyphen_param_matcher.sub("\\2", c))

@@ -108,19 +108,18 @@ def _add_current_path():
     get_added_paths(str(path))
 
 
-class ProjNameCompleter(ArgCompleter):
-    def __call__(self, **kwargs):
-        command: CommandContext = kwargs.pop("command")
-        for name, path in get_added_paths().items():
-            yield RichCompletion(name, description=path)
-        yield from ENVS
-        for path in _find_proj_path(command.prefix, str.startswith):
-            yield RichCompletion(path.name, description=str(path))
+def proj_name_completer(**kwargs):
+    command: CommandContext = kwargs.pop("command")
+    for name, path in get_added_paths().items():
+        yield RichCompletion(name, description=path)
+    yield from ENVS
+    for path in _find_proj_path(command.prefix, str.startswith):
+        yield RichCompletion(path.name, description=str(path))
 
 
 @Command.reg
 def _dev(
-    name: tp.cast(str, Argument(nargs="?", completer=ProjNameCompleter())),
+    name: tp.cast(str, Argument(nargs="?", completer=proj_name_completer)),
     add=False,
     ls=False,
 ):
@@ -154,7 +153,7 @@ def _dev(
         > dev --add
     """
 
-    if ls:
+    if ls or (name is None):
         _list_cmds()
     elif add:
         _add_current_path()
