@@ -19,9 +19,6 @@ classifiers = [
     "Topic :: Terminals",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
 ]
 
 
@@ -38,11 +35,11 @@ python = ">=3.6"
 xonsh = {version=">=0.10.1", python =">=3.6, <4.0"}
 arger = {version="^1.2.7", python =">=3.6, <4.0"}
 rich = {version="*", python =">=3.6, <4.0"}
+python-dotenv = "^0.19.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0"
 black = { version = "^20.8b1", allow-prereleases = true } 
-yapf = "^0.30.0" # can be used to format .xsh files with the special rules
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

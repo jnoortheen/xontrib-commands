@@ -3,12 +3,11 @@ import os
 import typing as tp
 from pathlib import Path
 
-import xonsh.tools as xt
 from arger import Argument
-from xonsh.cli_utils import ArgCompleter
+
+import xonsh.tools as xt
 from xonsh.completers.tools import RichCompletion
 from xonsh.parsers.completion_context import CommandContext
-
 from .utils import Command, xsh
 
 ENVS = {}
