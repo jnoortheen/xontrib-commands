@@ -96,6 +96,17 @@ def run(*args, capture: Optional[bool] = None) -> str:
             cmd_args = list(cmds)
         else:
             cmd_args = shlex.split(first_arg)
+    # from xonsh.built_ins import (
+    #     subproc_captured_stdout as capt,
+    #     subproc_uncaptured as run,
+    # )
+    #
+    # HAVE_UGLIFY = bool(capt(["which", "uglifyjs"]))
+    # run(
+    #     ["uglifyjs", js_target, "--compress", UGLIFY_FLAGS],
+    #     "|",
+    #     ["uglifyjs", "--mangle", "--output", min_target],
+    # )
     return func(cmd_args)
 
 

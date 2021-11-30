@@ -95,7 +95,7 @@ def _list_cmds():
 
     c = Console()
     paths = get_added_paths()
-    c.print("Paths", paths)
+    c.print("Paths:", paths)
 
 
 def _add_current_path():
