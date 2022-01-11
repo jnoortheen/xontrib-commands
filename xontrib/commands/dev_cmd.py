@@ -5,7 +5,7 @@ from pathlib import Path
 
 from arger import Argument
 
-import xonsh.tools as xt
+from functools import lru_cache
 from xonsh.completers.tools import RichCompletion
 from xonsh.parsers.completion_context import CommandContext
 from .utils import Command, xsh
@@ -13,7 +13,7 @@ from .utils import Command, xsh
 ENVS = {}
 
 
-@xt.lazyobject
+@lru_cache(None)
 def added_file_path() -> Path:
     return (
         Path(xsh.env.get("XDG_DATA_HOME", "~/.local/share")).resolve()
@@ -24,7 +24,7 @@ def added_file_path() -> Path:
 def update_saved_paths(paths=()):
     import json
 
-    file = tp.cast(Path, added_file_path)
+    file = added_file_path()
     if paths:
         content = json.dumps(list(set(paths)))
         file.write_text(content)
@@ -33,7 +33,7 @@ def update_saved_paths(paths=()):
 def get_added_paths(add_path: str = None) -> tp.Dict[str, str]:
     import json
 
-    file = tp.cast(Path, added_file_path)
+    file = added_file_path()
 
     if file.exists():
         paths = json.loads(file.read_text())
