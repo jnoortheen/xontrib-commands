@@ -1,9 +1,7 @@
 from xonsh.built_ins import XSH
-from .utils import Command
 
 
-@Command.reg
-def _load_env(
+def load_env(
     file=".env",
 ):
     """Load environment variables from dotenv files

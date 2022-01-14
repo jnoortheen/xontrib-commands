@@ -10,7 +10,6 @@ def module_name_completer(**_):
     yield from sys.modules
 
 
-@Command.reg
 def reload_mods(name: Annotated[str, Argument(completer=module_name_completer)]):
     """Reload any python module in the current xonsh session.
     Helpful during development.

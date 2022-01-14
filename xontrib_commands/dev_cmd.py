@@ -1,14 +1,13 @@
 import operator
 import os
 import typing as tp
+from arger import Argument
+from functools import lru_cache
 from pathlib import Path
 
-from arger import Argument
-
-from functools import lru_cache
 from xonsh.completers.tools import RichCompletion
 from xonsh.parsers.completion_context import CommandContext
-from .utils import Command, xsh
+from .utils import xsh
 
 ENVS = {}
 
@@ -77,17 +76,27 @@ def _start_proj_shell(env: tp.Union[str, Path]):
     return path
 
 
-def _find_proj_path(name, op):
-    for direc in xsh.env.get("PROJECT_PATHS", []):
-        for path in Path(direc).glob("*"):
-            if op(path.name, name):
-                yield path
+def get_uniq_project_paths():
+    proj_roots: "set[str]" = set(xsh.env.get("PROJECT_PATHS", []))
+    for path in list(proj_roots):
+        rest = proj_roots.difference({path})
+        if path.startswith(tuple(rest)):
+            proj_roots.remove(path)
+    return proj_roots
+
+
+def _find_proj_path(name, *funcs):
+    for direc in get_uniq_project_paths():
+        for path in Path(direc).rglob("*"):
+            if not path.is_dir():
+                continue
+            for op in funcs:
+                if op(path.name, name):
+                    yield path
 
 
 def find_proj_path(name):
-    for op in [operator.eq, str.startswith, operator.contains]:
-        for path in _find_proj_path(name, op):
-            return path
+    yield from _find_proj_path(name, operator.eq, str.startswith, operator.contains)
 
 
 def _list_cmds():
@@ -116,8 +125,7 @@ def proj_name_completer(**kwargs):
         yield RichCompletion(path.name, description=str(path))
 
 
-@Command.reg
-def _dev(
+def dev(
     name: tp.cast(str, Argument(nargs="?", completer=proj_name_completer)),
     add=False,
     ls=False,
