@@ -19,12 +19,12 @@ xontrib load commands
 
 ## building alias
 
-Use [`xontrib.commands.Command`](https://github.com/jnoortheen/xontrib-commands/blob/main/xontrib/commands.py#L9) 
+Use [`xontrib_commands.Command`](https://github.com/jnoortheen/xontrib-commands/blob/main/xontrib/commands.py#L9) 
 to build [arger](https://github.com/jnoortheen/arger) dispatcher
 for your functions.
 
 ```py
-from xontrib.commands import Command
+from xontrib_commands import Command
 @Command.reg
 def record_stats(pkg_name=".", path=".local/stats.txt"):
     stat = $(scc @(pkg_name))

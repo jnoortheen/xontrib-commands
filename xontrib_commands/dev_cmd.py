@@ -7,7 +7,7 @@ from pathlib import Path
 
 from xonsh.completers.tools import RichCompletion
 from xonsh.parsers.completion_context import CommandContext
-from .utils import xsh
+from xontrib_commands.utils import xsh
 
 ENVS = {}
 
@@ -76,8 +76,12 @@ def _start_proj_shell(env: tp.Union[str, Path]):
     return path
 
 
-def get_uniq_project_paths():
-    proj_roots: "set[str]" = set(xsh.env.get("PROJECT_PATHS", []))
+def get_uniq_project_paths(*paths):
+    """
+    >>> get_uniq_project_paths('~/src/py/', '~/src/py/_repos/', '~/src')
+    {'~/src'}
+    """
+    proj_roots: "set[str]" = set(paths)
     for path in list(proj_roots):
         rest = proj_roots.difference({path})
         if path.startswith(tuple(rest)):
@@ -86,8 +90,15 @@ def get_uniq_project_paths():
 
 
 def _find_proj_path(name, *funcs):
-    for direc in get_uniq_project_paths():
-        for path in Path(direc).rglob("*"):
+    paths = xsh.env.get("PROJECT_PATHS", [])
+    # todo: use cd from history
+    #  1. check history item size. changin it to namedtuple might save some space
+    # get_uniq_project_paths() - not using recurse directories, since it is slow
+    for direc in set(paths):
+        root = Path(direc).expanduser()
+        if not root.is_dir():
+            continue
+        for path in root.iterdir():
             if not path.is_dir():
                 continue
             for op in funcs:
@@ -96,7 +107,9 @@ def _find_proj_path(name, *funcs):
 
 
 def find_proj_path(name):
-    yield from _find_proj_path(name, operator.eq, str.startswith, operator.contains)
+    """return first found path"""
+    for path in _find_proj_path(name, operator.eq, str.startswith, operator.contains):
+        return path
 
 
 def _list_cmds():
@@ -178,3 +191,14 @@ def dev(
                 update_saved_paths(tuple(added_paths.values()))
 
         return _start_proj_shell(name)
+
+
+if __name__ == "__main__":
+    from xonsh.main import setup
+
+    setup(
+        env=[
+            ("PROJECT_PATHS", ["~/src"]),
+        ]
+    )
+    print(list(_find_proj_path("", str.startswith)))
