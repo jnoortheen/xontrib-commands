@@ -53,7 +53,7 @@ class Command(ArgParserAlias):
         self.parser.set_defaults(_stderr=stderr)
         self.parser.set_defaults(_spec=spec)
         self.parser.set_defaults(_stack=stack)
-        self.parser.run(*args)
+        self.parser.run(*args, capture_sys=False)
 
 
 def _get_proc_func_():

@@ -23,3 +23,5 @@ def load_env(
     for name, val in vals.items():
         print(f"Setting {name}")
         XSH.env[name] = val
+    else:
+        print(f"No env variables loaded from {file}.")
