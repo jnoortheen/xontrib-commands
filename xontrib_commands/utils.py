@@ -26,7 +26,7 @@ class Arger(arger.Arger):
 
 
 class Command(ArgParserAlias):
-    def __init__(self, func: Callable, threadable=True, **kwargs):
+    def __init__(self, func: Callable, threadable=True, capturable=True, **kwargs):
         """Convert the given function to alias and also create a argparser for its parameters"""
         super().__init__()
         self.prog = func.__name__.strip("_").replace("_", "-")
@@ -34,6 +34,10 @@ class Command(ArgParserAlias):
             from xonsh.tools import unthreadable
 
             unthreadable(self)
+        if not capturable:
+            from xonsh.tools import uncapturable
+
+            uncapturable(self)
 
         kwargs["func"] = func
         kwargs["prog"] = self.prog
@@ -51,6 +55,12 @@ class Command(ArgParserAlias):
     def reg_no_thread(cls, func, **kwargs):
         """pickle safe way to register alias function that is not threadable"""
         kwargs.setdefault("threadable", False)
+        return cls.reg(func, **kwargs)
+
+    @classmethod
+    def reg_no_cap(cls, func, **kwargs):
+        """pickle safe way to register alias function that is not capturable"""
+        kwargs.setdefault("capturable", False)
         return cls.reg(func, **kwargs)
 
     def build(self) -> "Arger":
