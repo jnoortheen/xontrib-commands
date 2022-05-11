@@ -1,6 +1,6 @@
-<p align="center">
+# xontrib-commands
+
 Useful xonsh-shell commands/alias/completer functions
-</p>
 
 ## Installation
 
@@ -24,7 +24,7 @@ to build [arger](https://github.com/jnoortheen/arger) dispatcher
 for your functions.
 
 ```py
-from xontrib_commands import Command
+from xontrib_commands.utils import Command
 @Command.reg
 def record_stats(pkg_name=".", path=".local/stats.txt"):
     stat = $(scc @(pkg_name))
