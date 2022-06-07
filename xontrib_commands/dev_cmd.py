@@ -35,7 +35,7 @@ def get_added_paths(add_path: str = None) -> tp.Dict[str, str]:
     file = added_file_path()
 
     if file.exists():
-        paths = json.loads(file.read_text())
+        paths = json.loads(file.read_text()) or []
     else:
         paths = []
     if add_path:
