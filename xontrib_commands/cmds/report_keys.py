@@ -3,7 +3,7 @@ import inspect
 import typing as tp
 from collections import defaultdict
 
-from .utils import Command
+from xontrib_commands.argerize import Command
 
 
 def format_key(k) -> str:
