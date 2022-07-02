@@ -3,8 +3,6 @@ import sys
 from arger import Argument
 from typing_extensions import Annotated
 
-from .utils import Command
-
 
 def module_name_completer(**_):
     yield from sys.modules
