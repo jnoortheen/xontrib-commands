@@ -92,7 +92,7 @@ optional arguments:
 ### 3. dev
 
 ```
-dev v1.0.0 (nuclear v1.1.10) - A command to cd into a directory. (Default action)
+dev - A command to cd into a directory. (Default action)
 
 Usage:
 dev [COMMAND] [OPTIONS] [NAME]
@@ -114,4 +114,9 @@ Commands:
 Run "dev COMMAND --help" for more information on a command.
 
 ```  
-          
+
+### 4. parallex
+
+```
+
+```

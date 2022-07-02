@@ -1,7 +1,7 @@
 import arger
 from typing import Callable
 
-from xonsh.built_ins import XonshSession
+from xonsh.built_ins import XSH
 from xonsh.cli_utils import get_argparse_formatter_class, ArgParserAlias
 
 
@@ -21,14 +21,7 @@ class Arger(arger.Arger):
 class Command(ArgParserAlias):
     """Use arger to create commands from functions"""
 
-    def __init__(
-        self,
-        func: Callable,
-        xsh: XonshSession,
-        threadable=True,
-        capturable=True,
-        **kwargs
-    ):
+    def __init__(self, func: Callable, threadable=True, capturable=True, **kwargs):
         """Convert the given function to alias and also create a argparser for its parameters"""
         super().__init__()
         self.prog = func.__name__.strip("_").replace("_", "-")
@@ -44,8 +37,9 @@ class Command(ArgParserAlias):
         kwargs["func"] = func
         kwargs["prog"] = self.prog
         self.kwargs = kwargs
+
         # convert to
-        xsh.aliases[self.prog] = self
+        XSH.aliases[self.prog] = self
 
     @classmethod
     def reg(cls, func, **kwargs):

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from xonsh.completers.tools import RichCompletion
 from xonsh.parsers.completion_context import CommandContext
-from xontrib_commands.utils import xsh
+from xonsh.built_ins import XSH as xsh
 
 ENVS = {}
 
