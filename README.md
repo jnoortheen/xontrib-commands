@@ -118,5 +118,25 @@ Run "dev COMMAND --help" for more information on a command.
 ### 4. parallex
 
 ```
+usage: parallex [-h] [-s] [-n] [-c] [args ...]
 
+Execute multiple subprocess in parallel
+
+positional arguments:
+  args  individual commands need to be quoted and passed as separate arguments
+
+options:
+  -h, --help
+                        show this help message and exit
+  -s, --shell
+                        each command should be run with system's commands
+  -n, --no-order
+                        commands output are interleaved and not ordered
+  -c, --hide-cmd
+                        do not print the running command
+
+Examples
+--------
+running linters in parallel
+    $ parallex "flake8 ." "mypy xonsh"
 ```

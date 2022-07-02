@@ -1,5 +1,6 @@
-from typing import List
 import sys
+from typing import List
+
 from xonsh.built_ins import XSH
 
 
@@ -64,7 +65,7 @@ def parallex(
     no_order :
         commands output are interleaved and not ordered
     hide_cmd:
-        do not print the running command
+        -c, --hide-cmd, do not print the running command
     Examples
     --------
     running linters in parallel
