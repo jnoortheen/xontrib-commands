@@ -23,7 +23,7 @@ classifiers = [
 
 
 packages = [
-    { include = "xontrib" }, { include = "xontrib_commands" },
+    { include = "xontrib_commands" },
 ]
 
 [tool.poetry.urls]
@@ -33,16 +33,15 @@ Code = "https://github.com/jnoortheen/xontrib-commands"
 
 
 [tool.poetry.dependencies]
-python = ">=3.6"
-xonsh = { version = ">=0.10.1", python = ">=3.6, <4.0" }
-arger = { version = "^1.2.7", python = ">=3.6, <4.0" }
+python = ">=3.8"
+xonsh = { version = ">=0.12.5" }
+arger = { version = ">=1.2.7", python = ">=3.6, <4.0" }
 rich = { version = "*", python = ">=3.6, <4.0" }
-python-dotenv = "^0.19.1"
+python-dotenv = ">=0.19.1"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.0"
-black = { version = "^20.8b1", allow-prereleases = true }
+pytest = "*"
+black = "*"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.plugins."xonsh.xontribs"]
+"commands" = "xontrib_commands.main"
