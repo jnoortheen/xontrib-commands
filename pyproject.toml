@@ -1,47 +1,42 @@
-[tool.poetry]
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+]
+
+[tool.pdm.build]
+includes = ["xontrib_commands"]
+
+[project]
+# PEP 621 project metadata
+# See https://www.python.org/dev/peps/pep-0621/
+authors = [
+    {name = "Noortheen Raja NJ", email = "jnoortheen@gmail.com"},
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+dependencies = [
+    "xonsh>=0.12.5",
+    "arger>=1.2.7; python_version >= \"3.6\" and python_version < \"4.0\"",
+    "rich; python_version >= \"3.6\" and python_version < \"4.0\"",
+    "python-dotenv>=0.19.1",
+]
 name = "xontrib-commands"
 version = "0.4.1"
 description = "Useful xonsh-shell commands/alias functions"
-authors = ["Noortheen Raja NJ <jnoortheen@gmail.com>"]
-
-license = "MIT"
 readme = "README.md"
+keywords = ["xontrib", "xonsh"]
+classifiers = ["Intended Audience :: Developers", "License :: OSI Approved :: MIT License", "Natural Language :: English", "Operating System :: OS Independent", "Topic :: System :: Shells", "Topic :: System :: System Shells", "Topic :: Terminals", "Programming Language :: Python", "Programming Language :: Python :: 3"]
 
-repository = "https://github.com/jnoortheen/xontrib-commands"
-keywords = ['xontrib', 'xonsh']
-classifiers = [
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Natural Language :: English",
-    "Operating System :: OS Independent",
-    "Topic :: System :: Shells",
-    "Topic :: System :: System Shells",
-    "Topic :: Terminals",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-]
-
-
-packages = [
-    { include = "xontrib_commands" },
-]
-
-[tool.poetry.urls]
+[project.urls]
 Documentation = "https://github.com/jnoortheen/xontrib-commands/blob/master/README.md"
 Code = "https://github.com/jnoortheen/xontrib-commands"
 "Issue tracker" = "https://github.com/jnoortheen/xontrib-commands/issues"
+repository = "https://github.com/jnoortheen/xontrib-commands"
 
+[project.entry-points."xonsh.xontribs"]
+commands = "xontrib_commands.main"
 
-[tool.poetry.dependencies]
-python = ">=3.8"
-xonsh = { version = ">=0.12.5" }
-arger = { version = ">=1.2.7", python = ">=3.6, <4.0" }
-rich = { version = "*", python = ">=3.6, <4.0" }
-python-dotenv = ">=0.19.1"
-
-[tool.poetry.dev-dependencies]
-pytest = "*"
-black = "*"
-
-[tool.poetry.plugins."xonsh.xontribs"]
-"commands" = "xontrib_commands.main"
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
