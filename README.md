@@ -21,7 +21,7 @@ xontrib load commands
 
 Use [`xontrib_commands.argerize:Command`](https://github.com/jnoortheen/xontrib-commands/blob/1bf016e08f192478c6322b2a859ae48567372bdb/xontrib_commands/argerize.py#L21) 
 to build [arger](https://github.com/jnoortheen/arger) dispatcher
-for your functions.
+for your functions. This will create a nice alias function with auto-completions support.
 
 ```py
 from xontrib_commands.argerize import Command
@@ -30,6 +30,32 @@ from xontrib_commands.argerize import Command
 def record_stats(pkg_name=".", path=".local/stats.txt"):
     stat = $(scc @(pkg_name))
     echo @($(date) + stat) | tee -a @(path)
+```
+
+- Directly passing the `Arger` instances is also supported. 
+
+```py
+from xontrib_commands.argerize import Arger, Command
+
+arger = Arger(prog="tst", description="App Description goes here")
+
+@arger.add_cmd
+def create(name: str):
+    """Create new test.
+
+    :param name: Name of the test
+    """
+    print(locals())
+
+@arger.add_cmd
+def remove(*name: str):
+    """Remove a test with variadic argument.
+
+    :param name: tests to remove
+    """
+    print(locals())
+
+Command.reg(arger)
 ```
 
 Now a full CLI is ready
