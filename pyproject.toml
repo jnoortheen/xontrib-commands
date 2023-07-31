@@ -1,19 +1,7 @@
-[project.optional-dependencies]
-dev = [
-    "pytest",
-    "black",
-]
-
-[tool.pdm.build]
-includes = ["xontrib_commands"]
-
 [project]
-# PEP 621 project metadata
-# See https://www.python.org/dev/peps/pep-0621/
 authors = [
-    {name = "Noortheen Raja NJ", email = "jnoortheen@gmail.com"},
+    { name = "Noortheen Raja NJ", email = "jnoortheen@gmail.com" },
 ]
-license = {text = "MIT"}
 requires-python = ">=3.8"
 dependencies = [
     "xonsh>=0.12.5",
@@ -22,11 +10,33 @@ dependencies = [
     "python-dotenv>=0.19.1",
 ]
 name = "xontrib-commands"
-version = "0.4.1"
+version = "0.4.4"
 description = "Useful xonsh-shell commands/alias functions"
 readme = "README.md"
-keywords = ["xontrib", "xonsh"]
-classifiers = ["Intended Audience :: Developers", "License :: OSI Approved :: MIT License", "Natural Language :: English", "Operating System :: OS Independent", "Topic :: System :: Shells", "Topic :: System :: System Shells", "Topic :: Terminals", "Programming Language :: Python", "Programming Language :: Python :: 3"]
+keywords = [
+    "xontrib",
+    "xonsh",
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: System :: Shells",
+    "Topic :: System :: System Shells",
+    "Topic :: Terminals",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+]
+
+[project.license]
+text = "MIT"
 
 [project.urls]
 Documentation = "https://github.com/jnoortheen/xontrib-commands/blob/master/README.md"
@@ -37,6 +47,13 @@ repository = "https://github.com/jnoortheen/xontrib-commands"
 [project.entry-points."xonsh.xontribs"]
 commands = "xontrib_commands.main"
 
+[tool.pdm.build]
+includes = [
+    "xontrib_commands",
+]
+
 [build-system]
-requires = ["pdm-pep517>=1.0.0"]
+requires = [
+    "pdm-pep517>=1.0.0",
+]
 build-backend = "pdm.pep517.api"
