@@ -20,10 +20,10 @@ jobs:
 
       - name: build release distributions
         run: |
-          # NOTE: put your own distribution build steps here.
+          pip install build
           python -m build
 
-      - name: upload windows dists
+      - name: upload dists
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
