@@ -2,7 +2,6 @@ import operator
 import os
 import typing as tp
 from arger import Argument
-from functools import lru_cache
 from pathlib import Path
 
 from xonsh.completers.tools import RichCompletion
@@ -12,45 +11,57 @@ from xonsh.built_ins import XSH as xsh
 ENVS = {}
 
 
-@lru_cache(None)
-def added_file_path() -> Path:
-    return (
+class DevPaths:
+    def __init__(self):
+        self.file = (
         Path(xsh.env.get("XDG_DATA_HOME", "~/.local/share")).resolve()
         / "dev-paths.json"
     )
 
+    def update_saved(self, *paths: str) -> None:
+        import json
 
-def update_saved_paths(paths=()):
-    import json
+        if paths:
+            content = json.dumps(list(set(paths)))
+            self.file.write_text(content)
 
-    file = added_file_path()
-    if paths:
-        content = json.dumps(list(set(paths)))
-        file.write_text(content)
+    def load(self) -> list[str]:
+        import json
 
+        if self.file.exists():
+            return json.loads(self.file.read_text()) or []
+        return []
 
-def get_added_paths(add_path: str = None) -> tp.Dict[str, str]:
-    import json
+    def get_added_paths(self, add_path: str | None = None) -> tp.Dict[str, str]:
+        paths = self.load()
+        if add_path:
+            paths.append(add_path)
+            self.update_saved(*paths)
 
-    file = added_file_path()
+        return {os.path.split(p)[-1]: p for p in paths}
 
-    if file.exists():
-        paths = json.loads(file.read_text()) or []
-    else:
+    def clean_paths(self):
+        from rich.console import Console
+
+        c = Console()
         paths = []
-    if add_path:
-        paths.append(add_path)
-        update_saved_paths(paths)
+        for path in self.load():
+            p = Path(path)
+            if not p.exists():
+                c.log("Removing paths that no longer exists", {p.name: p})
+            else:
+                paths.append(path)
+        self.update_saved(*paths)
 
-    return {os.path.split(p)[-1]: p for p in paths}
 
+dev_paths = DevPaths()
 
 def register_project(fn: tp.Callable = None):
     """Register new project.
 
     Parameters
     ----------
-    call
+    fn
         This function will get invoked upon finding the project_path.
         the function name will be used to search in $PROJECT_PATHS
     """
@@ -116,7 +127,7 @@ def _list_cmds():
     from rich.console import Console
 
     c = Console()
-    paths = get_added_paths()
+    paths = dev_paths.get_added_paths()
     c.print("Paths:", paths)
 
 
@@ -126,12 +137,12 @@ def _add_current_path():
     c = Console()
     path = Path.cwd().resolve()
     c.log("Adding cwd to project-paths", {path.name: path})
-    get_added_paths(str(path))
+    dev_paths.get_added_paths(str(path))
 
 
 def proj_name_completer(**kwargs):
     command: CommandContext = kwargs.pop("command")
-    for name, path in get_added_paths().items():
+    for name, path in dev_paths.get_added_paths().items():
         yield RichCompletion(name, description=path)
     yield from ENVS
     for path in _find_proj_path(command.prefix, str.startswith):
@@ -142,6 +153,7 @@ def dev(
     name: tp.cast(str, Argument(nargs="?", completer=proj_name_completer)),
     add=False,
     ls=False,
+        clean=False,
 ):
     """A command to cd into a directory
 
@@ -161,6 +173,8 @@ def dev(
         also that is used during completions.
     ls
         show currently registered paths
+    clean
+        remove paths that no longer exists
 
     Notes
     -----
@@ -177,8 +191,10 @@ def dev(
         _list_cmds()
     elif add:
         _add_current_path()
+    elif clean:
+        dev_paths.clean_paths()
     else:
-        added_paths = get_added_paths()
+        added_paths = dev_paths.get_added_paths()
         if name in ENVS:
             ENVS[name]()
         elif name in added_paths:
@@ -188,7 +204,7 @@ def dev(
             else:
                 # old/expired link
                 added_paths.pop(name)
-                update_saved_paths(tuple(added_paths.values()))
+                dev_paths.update_saved(*tuple(added_paths.values()))
 
         return _start_proj_shell(name)
 
