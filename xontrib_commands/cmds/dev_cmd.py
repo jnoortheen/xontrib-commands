@@ -187,12 +187,12 @@ def dev(
         > dev --add
     """
 
-    if ls or (name is None):
-        _list_cmds()
+    if clean:
+        dev_paths.clean_paths()
     elif add:
         _add_current_path()
-    elif clean:
-        dev_paths.clean_paths()
+    elif ls or (name is None):
+        _list_cmds()
     else:
         added_paths = dev_paths.get_added_paths()
         if name in ENVS:
