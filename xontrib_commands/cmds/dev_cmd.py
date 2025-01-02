@@ -178,7 +178,7 @@ def dev(
 
     Notes
     -----
-        One can use `register_project` function to regiter custom_callbacks to run on cd to project path
+        One can use `register_project` function to register custom_callbacks to run on cd to project path
 
     Examples
     -------
