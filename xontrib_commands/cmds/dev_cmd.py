@@ -105,6 +105,7 @@ def _find_proj_path(name, *funcs):
     # todo: use cd from history
     #  1. check history item size. changin it to namedtuple might save some space
     # get_uniq_project_paths() - not using recurse directories, since it is slow
+    found_paths = []
     for direc in set(paths):
         root = Path(direc).expanduser()
         if not root.is_dir():
@@ -112,9 +113,11 @@ def _find_proj_path(name, *funcs):
         for path in root.iterdir():
             if not path.is_dir():
                 continue
-            for op in funcs:
+            for i, op in enumerate(funcs):
                 if op(path.name, name):
-                    yield path
+                    found_paths.append((i, path))
+                    
+    yield from map(operator.itemgetter(1),sorted(found_paths,key=operator.itemgetter(0)))
 
 
 def find_proj_path(name):
